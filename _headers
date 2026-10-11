@@ -1,0 +1,27 @@
+# Regras unificadas para Cloudflare Pages / Netlify
+/*
+  X-Content-Type-Options: nosniff
+
+# HTML principal e HTMLs de cada app sempre revalidados
+/index.html
+  Cache-Control: no-cache
+
+/*/index.html
+  Cache-Control: no-cache
+
+# Garantir MIME type correto para WebAssembly Streaming Compilation
+/*.wasm
+  Content-Type: application/wasm
+
+/*/*.wasm
+  Content-Type: application/wasm
+
+# Apps com nomes fixos sem hash no arquivo (EffectCraft, FilmCraft, LightCraft) precisam de revalidação
+/effectcraft-web-0.8.0/*
+  Cache-Control: no-cache
+
+/filmcraft-web-0.6.0/*
+  Cache-Control: no-cache
+
+/lightcraft-web-0.6.0/*
+  Cache-Control: no-cache

@@ -1,0 +1,50 @@
+name: Deploy to Cloudflare R2 / AWS S3
+
+on:
+  workflow_dispatch:
+  # Descomente abaixo quando configurar os Secrets no GitHub se quiser deploy automático a cada push:
+  # push:
+  #   branches: ["main"]
+
+jobs:
+  deploy-s3-r2:
+    runs-on: ubuntu-latest
+    if: ${{ secrets.S3_BUCKET != '' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare clean production directory
+        run: |
+          mkdir -p _site
+          cp index.html _headers _site/
+          for dir in *-web-*; do
+            if [ -d "$dir" ]; then
+              mkdir -p "_site/$dir"
+              rsync -a \
+                --exclude='.fingerprint' \
+                --exclude='build' \
+                --exclude='deps' \
+                --exclude='incremental' \
+                --exclude='.cargo*' \
+                --exclude='*.br' \
+                --exclude='*.gz' \
+                "$dir/" "_site/$dir/"
+            fi
+          done
+
+      - name: Sync to Cloudflare R2 or AWS S3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION || 'auto' }}
+          S3_BUCKET: ${{ secrets.S3_BUCKET }}
+          S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
+        run: |
+          ENDPOINT_ARG=""
+          if [ -n "$S3_ENDPOINT" ]; then
+            ENDPOINT_ARG="--endpoint-url $S3_ENDPOINT"
+          fi
+          aws s3 sync _site "s3://$S3_BUCKET" $ENDPOINT_ARG --exclude "*.wasm" --exclude "*index.html" --delete
+          aws s3 sync _site "s3://$S3_BUCKET" $ENDPOINT_ARG --exclude "*" --include "*.wasm" --content-type "application/wasm" --cache-control "public, max-age=3600"
+          aws s3 sync _site "s3://$S3_BUCKET" $ENDPOINT_ARG --exclude "*" --include "*index.html" --content-type "text/html; charset=utf-8" --cache-control "no-cache"

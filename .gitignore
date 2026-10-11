@@ -1,0 +1,27 @@
+# Arquivos compactados originais (240 MB)
+COMPACTTS/
+*.zip
+
+# Scripts de execução local e utilitários de deploy
+serve.py
+iniciar-portal.bat
+enviar-github.bat
+deploy-cloud.ps1
+dist-deploy/
+
+# Artefatos residuais de compilação Rust/Cargo e cópias pré-comprimidas duplicadas (lightcraft-web-0.6.0)
+**/.fingerprint/
+**/build/
+**/deps/
+**/incremental/
+**/.cargo-artifact-lock
+**/.cargo-build-lock
+**/.cargo-lock
+**/*.br
+**/*.gz
+
+# Arquivos de sistema e IDEs
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

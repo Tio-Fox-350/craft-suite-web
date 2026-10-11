@@ -1,0 +1,1472 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
+  <title>Craft App Suite — Portal Web Unificado</title>
+  <link rel="icon" href="./artcraft-launcher-web-0.2.0/ai.storyteller.artcraft-launcher-9a16edafac98b1f8.png">
+  <style>
+    :root {
+      --bg-base: #0d0e11;
+      --bg-surface: #15171c;
+      --bg-elevated: #1e2129;
+      --bg-hover: #272b36;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.16);
+      --text-primary: #f3f4f6;
+      --text-secondary: #9ca3af;
+      --text-muted: #6b7280;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --accent-glow: rgba(59, 130, 246, 0.25);
+      --danger: #ef4444;
+      --success: #10b981;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --header-h: 52px;
+      --sidebar-w: 250px;
+      --sidebar-collapsed-w: 64px;
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Layout Principal */
+    .app-shell {
+      display: flex;
+      flex-direction: column;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    /* Barra Superior (Topbar + Tabs) */
+    .topbar {
+      height: var(--header-h);
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      gap: 12px;
+      user-select: none;
+      z-index: 20;
+    }
+
+    .brand-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .icon-btn:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+
+    .icon-btn.active {
+      background: var(--bg-elevated);
+      color: var(--accent);
+      border-color: var(--border-subtle);
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: transparent;
+    }
+
+    .brand-logo:hover {
+      background: var(--bg-hover);
+    }
+
+    .brand-badge {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 13px;
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
+    }
+
+    /* Abas de Apps Abertos (Workspaces) */
+    .workspace-tabs {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex: 1;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding: 4px 0;
+    }
+
+    .workspace-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .tab-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 34px;
+      padding: 0 10px 0 12px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .tab-item:hover {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+    }
+
+    .tab-item.active {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+    }
+
+    .tab-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .tab-close {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1;
+      margin-left: 2px;
+    }
+
+    .tab-close:hover {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+    }
+
+    /* Ações da Direita na Topbar */
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .renderer-select {
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 5px 8px;
+      font-size: 12px;
+      font-family: var(--font-sans);
+      cursor: pointer;
+      outline: none;
+    }
+
+    .renderer-select:hover, .renderer-select:focus {
+      border-color: var(--border-strong);
+      color: var(--text-primary);
+    }
+
+    .action-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 32px;
+      padding: 0 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+
+    .action-pill:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+    }
+
+    .kbd-hint {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      padding: 1px 4px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--text-muted);
+    }
+
+    /* Corpo Principal (Sidebar + Stage) */
+    .main-area {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - var(--header-h));
+      overflow: hidden;
+    }
+
+    /* Barra Lateral */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      flex-shrink: 0;
+      user-select: none;
+      z-index: 15;
+    }
+
+    .sidebar.collapsed {
+      width: var(--sidebar-collapsed-w);
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--bg-hover) transparent;
+    }
+
+    .nav-section-title {
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      padding: 10px 10px 4px;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .sidebar.collapsed .nav-section-title {
+      opacity: 0;
+      height: 8px;
+      padding: 0;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 500;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.12s ease;
+      position: relative;
+    }
+
+    .nav-item:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+
+    .nav-item.active {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border-color: var(--border-subtle);
+    }
+
+    .app-tile-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 11.5px;
+      letter-spacing: -0.03em;
+      flex-shrink: 0;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+
+    .nav-label-group {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      flex: 1;
+    }
+
+    .sidebar.collapsed .nav-label-group,
+    .sidebar.collapsed .running-indicator {
+      display: none;
+    }
+
+    .nav-app-name {
+      font-weight: 600;
+      font-size: 12.5px;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .nav-app-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .running-indicator {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 6px var(--success);
+      flex-shrink: 0;
+    }
+
+    /* Palco Central (Dashboard + Container de Iframes) */
+    .stage {
+      flex: 1;
+      position: relative;
+      background: var(--bg-base);
+      overflow: hidden;
+    }
+
+    /* View do Dashboard */
+    .dashboard-view {
+      position: absolute;
+      inset: 0;
+      overflow-y: auto;
+      padding: 32px 40px 64px;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(59, 130, 246, 0.08), transparent 40%),
+        radial-gradient(circle at 85% 20%, rgba(139, 92, 246, 0.08), transparent 40%),
+        var(--bg-base);
+    }
+
+    .dashboard-view.hidden {
+      display: none;
+    }
+
+    .dashboard-container {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    /* Hero Banner */
+    .hero-banner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 24px 28px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, rgba(30, 33, 41, 0.9), rgba(21, 23, 28, 0.95));
+      border: 1px solid var(--border-subtle);
+      margin-bottom: 28px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .hero-text h1 {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+      background: linear-gradient(90deg, #ffffff, #a5b4fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-text p {
+      color: var(--text-secondary);
+      font-size: 14px;
+      max-width: 680px;
+      line-height: 1.5;
+    }
+
+    .hero-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .spec-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .spec-badge strong {
+      color: var(--text-primary);
+    }
+
+    /* Barra de Busca e Filtros */
+    .controls-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      min-width: 260px;
+      max-width: 420px;
+    }
+
+    .search-box input {
+      width: 100%;
+      height: 40px;
+      padding: 0 14px 0 38px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      font-size: 13.5px;
+      outline: none;
+      transition: all 0.15s ease;
+    }
+
+    .search-box input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .filter-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .filter-btn {
+      padding: 7px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .filter-btn:hover {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+    }
+
+    .filter-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+      box-shadow: 0 2px 10px var(--accent-glow);
+    }
+
+    /* Grid de Aplicativos */
+    .apps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 16px;
+    }
+
+    .app-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: all 0.18s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .app-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-strong);
+      background: var(--bg-elevated);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+    }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .card-identity {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .card-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 17px;
+      letter-spacing: -0.03em;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      flex-shrink: 0;
+    }
+
+    .card-titles h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .version-tag {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .inspired-tag {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .inspired-tag strong {
+      color: #d1d5db;
+      font-weight: 600;
+    }
+
+    .card-desc {
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text-secondary);
+      flex: 1;
+    }
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      padding-top: 10px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-launch {
+      flex: 1;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background 0.15s ease;
+    }
+
+    .btn-launch:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-newtab {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+
+    .btn-newtab:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+    }
+
+    /* Container dos Iframes */
+    .frames-stage {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .frames-stage.active {
+      pointer-events: auto;
+    }
+
+    .app-iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: none;
+      background: #18181b;
+    }
+
+    .app-iframe.visible {
+      display: block;
+    }
+
+    /* Aviso de file:// protocol */
+    .protocol-warning {
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #fca5a5;
+      padding: 14px 18px;
+      border-radius: var(--radius-md);
+      margin-bottom: 20px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .protocol-warning.show {
+      display: flex;
+    }
+
+    .protocol-warning code {
+      font-family: var(--font-mono);
+      background: rgba(0, 0, 0, 0.35);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #fff;
+    }
+
+    /* Modal Dialog Nativo */
+    dialog {
+      margin: auto;
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      max-width: 560px;
+      width: 90%;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.65);
+    }
+
+    dialog::backdrop {
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+    }
+
+    .dialog-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .dialog-header h2 {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .dialog-body {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .dialog-body pre {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: #a5b4fc;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        top: var(--header-h);
+        z-index: 30;
+      }
+      .sidebar.collapsed {
+        transform: translateX(-100%);
+      }
+      .dashboard-view {
+        padding: 20px 16px 48px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Barra Superior -->
+    <header class="topbar">
+      <div class="brand-area">
+        <button type="button" id="toggle-sidebar" class="icon-btn" title="Alternar barra lateral (Ctrl+B)" aria-label="Alternar barra lateral">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/>
+          </svg>
+        </button>
+        <button type="button" id="btn-home" class="brand-logo" title="Voltar ao Catálogo de Aplicativos">
+          <span class="brand-badge">A</span>
+          <span>ArtCraft Suite</span>
+        </button>
+      </div>
+
+      <!-- Abas de Instâncias Abertas -->
+      <div class="workspace-tabs" id="workspace-tabs" role="tablist" aria-label="Aplicativos em execução">
+        <button type="button" class="tab-item active" id="tab-dashboard" role="tab" aria-selected="true">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+          </svg>
+          <span>Catálogo (Hub)</span>
+        </button>
+      </div>
+
+      <!-- Controles do App Ativo e Ajuda -->
+      <div class="topbar-actions">
+        <select id="renderer-mode" class="renderer-select" title="Selecionar Backend Gráfico para os Apps">
+          <option value=""> Motor: Automático (WebGPU / WebGL2)</option>
+          <option value="?webgl">Motor: Forçar WebGL2 (?webgl)</option>
+          <option value="?cpu">Motor: Forçar CPU (?cpu)</option>
+        </select>
+
+        <button type="button" id="btn-reload-app" class="icon-btn" title="Recarregar aplicativo atual" aria-label="Recarregar aplicativo atual" hidden>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/>
+          </svg>
+        </button>
+
+        <a id="btn-external-app" href="#" target="_blank" rel="noopener" class="icon-btn" title="Abrir aplicativo atual em nova guia" aria-label="Abrir aplicativo atual em nova guia" hidden>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+        </a>
+
+        <button type="button" id="btn-fullscreen" class="icon-btn" title="Tela Cheia (F11)" aria-label="Alternar Tela Cheia">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+          </svg>
+        </button>
+
+        <button type="button" id="btn-server-info" class="action-pill" title="Instruções de Servidor Local e Hospedagem">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          <span>Hospedagem</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Área Principal -->
+    <div class="main-area">
+      <!-- Barra Lateral de Navegação Rápida -->
+      <aside class="sidebar" id="sidebar" aria-label="Lista de aplicativos">
+        <nav class="sidebar-nav" id="sidebar-nav"></nav>
+      </aside>
+
+      <!-- Palco Central -->
+      <main class="stage">
+        <!-- Visão Inicial: Catálogo / Hub -->
+        <section class="dashboard-view" id="dashboard-view">
+          <div class="dashboard-container">
+            <!-- Alerta caso aberto via file:// -->
+            <div class="protocol-warning" id="protocol-warning" role="alert">
+              <div>
+                <strong>Atenção:</strong> Você abriu este portal via protocolo <code>file://</code>. Navegadores bloqueiam o carregamento de módulos <strong>WebAssembly (.wasm)</strong> fora de um servidor HTTP.
+                Execute <code>python -m http.server 8080</code> ou <code>npx serve .</code> na pasta raiz e acesse <code>http://localhost:8080</code>.
+              </div>
+              <button type="button" class="action-pill" id="btn-open-guide">Ver Comando</button>
+            </div>
+
+            <!-- Hero -->
+            <div class="hero-banner">
+              <div class="hero-text">
+                <h1>The Craft App Suite — Web Studio</h1>
+                <p>Suíte criativa e de produtividade 100% escrita em Rust + WebAssembly (egui &amp; wgpu). Abra múltiplos aplicativos simultaneamente em abas sem recarregar seu trabalho.</p>
+              </div>
+              <div class="hero-badges">
+                <span class="spec-badge">🦀 <strong>100% Rust</strong> + WASM</span>
+                <span class="spec-badge">⚡ <strong>WebGPU</strong> / WebGL2</span>
+                <span class="spec-badge">🔒 <strong>100% Local</strong> (OPFS / IndexedDB)</span>
+              </div>
+            </div>
+
+            <!-- Busca e Filtros -->
+            <div class="controls-bar">
+              <search class="search-box">
+                <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input type="search" id="search-input" placeholder="Buscar aplicativo ou equivalente (ex: Photoshop, Vídeo, Excel, CAD)..." aria-label="Buscar aplicativos">
+              </search>
+
+              <div class="filter-pills" id="filter-pills" role="group" aria-label="Filtrar por categoria">
+                <button type="button" class="filter-btn active" data-cat="all">Todos (13)</button>
+                <button type="button" class="filter-btn" data-cat="creative">Design &amp; Imagem</button>
+                <button type="button" class="filter-btn" data-cat="video">Vídeo &amp; Áudio</button>
+                <button type="button" class="filter-btn" data-cat="office">Produtividade &amp; Docs</button>
+                <button type="button" class="filter-btn" data-cat="engineering">CAD &amp; Sistema</button>
+              </div>
+            </div>
+
+            <!-- Grid de Cards -->
+            <div class="apps-grid" id="apps-grid"></div>
+          </div>
+        </section>
+
+        <!-- Container onde os Iframes dos aplicativos ficam vivos em memória -->
+        <div class="frames-stage" id="frames-stage"></div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Modal de Instruções de Servidor -->
+  <dialog id="server-modal" closedby="any">
+    <div class="dialog-header">
+      <h2>Como executar o Portal Web localmente</h2>
+      <form method="dialog">
+        <button class="icon-btn" aria-label="Fechar">✕</button>
+      </form>
+    </div>
+    <div class="dialog-body">
+      <p>Os aplicativos da <strong>Craft App Suite</strong> utilizam <strong>WebAssembly Streaming</strong>, <strong>WebGPU/WebGL2</strong> e armazenamento local (OPFS/IndexedDB), que exigem contexto seguro (<code>http://localhost</code> ou <code>https://</code>).</p>
+      <p>Abra um terminal na pasta <code>F:\ADOBE GENERIOCO WEB</code> e execute um dos comandos abaixo:</p>
+      <pre tabindex="0"><code># Opção 1: Usando Python 3
+python -m http.server 8080
+
+# Opção 2: Usando Node.js
+npx serve -l 8080 .</code></pre>
+      <p>Em seguida, abra no seu navegador: <strong><code>http://localhost:8080</code></strong></p>
+      <p><strong>Dica de Performance:</strong> Quando você abre vários aplicativos neste portal, eles permanecem ativos em abas na barra superior para você alternar instantaneamente sem perder o estado da edição. Caso queira liberar memória RAM/VRAM de um app, clique no <code>×</code> da aba correspondente.</p>
+    </div>
+  </dialog>
+
+  <script>
+    const APPS = [
+      {
+        id: 'photocraft',
+        name: 'PhotoCraft',
+        code: 'Ps',
+        version: '0.7.0',
+        inspiredBy: 'Adobe Photoshop',
+        category: 'creative',
+        categoryLabel: 'Design & Imagem',
+        folder: './photocraft-web-0.7.0/index.html',
+        color: '#001e36',
+        accent: '#31a8ff',
+        size: '24,1 MB',
+        desc: 'Edição profissional de imagens raster, camadas de ajuste, máscaras, estilos de camada, tipografia, pincéis e suporte real a arquivos PSD.'
+      },
+      {
+        id: 'vectorcraft',
+        name: 'VectorCraft',
+        code: 'Ai',
+        version: '0.9.0',
+        inspiredBy: 'Adobe Illustrator',
+        category: 'creative',
+        categoryLabel: 'Design & Imagem',
+        folder: './vectorcraft-web-0.9.0/index.html',
+        color: '#330000',
+        accent: '#ff9a00',
+        size: '54,0 MB',
+        desc: 'Ilustração vetorial de precisão, curvas Bézier, pranchetas (artboards), operações booleanas, gradientes e exportação SVG/PDF.'
+      },
+      {
+        id: 'lightcraft',
+        name: 'LightCraft',
+        code: 'Lr',
+        version: '0.6.0',
+        inspiredBy: 'Adobe Lightroom',
+        category: 'creative',
+        categoryLabel: 'Design & Imagem',
+        folder: './lightcraft-web-0.6.0/index.html',
+        color: '#001d26',
+        accent: '#38bdf8',
+        size: '13,0 MB',
+        desc: 'Gerenciamento de catálogo fotográfico e revelação digital não-destrutiva (RAW, curvas de tom, HSL, nitidez e presets).'
+      },
+      {
+        id: 'designcraft',
+        name: 'DesignCraft',
+        code: 'Id',
+        version: '0.6.0',
+        inspiredBy: 'Adobe InDesign',
+        category: 'creative',
+        categoryLabel: 'Design & Imagem',
+        folder: './designcraft-web-0.6.0/index.html',
+        color: '#49021f',
+        accent: '#ff3366',
+        size: '41,3 MB',
+        desc: 'Diagramação editorial e publicação de páginas mestras, colunas tipográficas, estilos de parágrafo e fechamento de arquivos.'
+      },
+      {
+        id: 'filmcraft',
+        name: 'FilmCraft',
+        code: 'Pr',
+        version: '0.6.0',
+        inspiredBy: 'Adobe Premiere Pro',
+        category: 'video',
+        categoryLabel: 'Vídeo & Áudio',
+        folder: './filmcraft-web-0.6.0/index.html',
+        color: '#00005b',
+        accent: '#9999ff',
+        size: '41,7 MB',
+        desc: 'Edição de vídeo não-linear (NLE), timeline multi-pista, correção de cor, transições, mixagem de áudio e codecs nativos em Rust.'
+      },
+      {
+        id: 'effectcraft',
+        name: 'EffectCraft',
+        code: 'Ae',
+        version: '0.8.0',
+        inspiredBy: 'Adobe After Effects',
+        category: 'video',
+        categoryLabel: 'Vídeo & Áudio',
+        folder: './effectcraft-web-0.8.0/index.html',
+        color: '#00005b',
+        accent: '#cf96fd',
+        size: '58,0 MB',
+        desc: 'Motion graphics e efeitos visuais com 306 efeitos integrados, Graph Editor, camadas 3D com câmera/luzes, expressões JS e exportação Lottie.'
+      },
+      {
+        id: 'soundcraft',
+        name: 'SoundCraft',
+        code: 'Au',
+        version: '0.5.0',
+        inspiredBy: 'Pro Tools / Audition',
+        category: 'video',
+        categoryLabel: 'Vídeo & Áudio',
+        folder: './soundcraft-web-0.5.0/index.html',
+        color: '#062e22',
+        accent: '#10b981',
+        size: '12,0 MB',
+        desc: 'Estação de trabalho de áudio digital (DAW) para gravação, edição de formas de onda, mixagem multipista e processamento de efeitos.'
+      },
+      {
+        id: 'pdfcraft',
+        name: 'PdfCraft',
+        code: 'Ac',
+        version: '0.6.0',
+        inspiredBy: 'Adobe Acrobat',
+        category: 'office',
+        categoryLabel: 'Produtividade & Docs',
+        folder: './pdfcraft-web-0.6.0/index.html',
+        color: '#3b0404',
+        accent: '#ef4444',
+        size: '39,0 MB',
+        desc: 'Leitura, inspeção, anotação, organização de páginas, mesclagem e proteção de documentos PDF.'
+      },
+      {
+        id: 'wordcraft',
+        name: 'WordCraft',
+        code: 'Wd',
+        version: '0.5.0',
+        inspiredBy: 'Microsoft Word',
+        category: 'office',
+        categoryLabel: 'Produtividade & Docs',
+        folder: './wordcraft-web-0.5.0/index.html',
+        color: '#0c2340',
+        accent: '#3b82f6',
+        size: '34,9 MB',
+        desc: 'Processador de textos rico para redação de documentos, formatação avançada, estilos, tabelas e paginação.'
+      },
+      {
+        id: 'gridcraft',
+        name: 'GridCraft',
+        code: 'Xl',
+        version: '0.5.0',
+        inspiredBy: 'Microsoft Excel',
+        category: 'office',
+        categoryLabel: 'Produtividade & Docs',
+        folder: './gridcraft-web-0.5.0/index.html',
+        color: '#06371b',
+        accent: '#22c55e',
+        size: '16,0 MB',
+        desc: 'Planilhas eletrônicas de alta performance, fórmulas, tabelas de dados, formatação condicional e gráficos.'
+      },
+      {
+        id: 'deckcraft',
+        name: 'DeckCraft',
+        code: 'Pp',
+        version: '0.5.0',
+        inspiredBy: 'Microsoft PowerPoint',
+        category: 'office',
+        categoryLabel: 'Produtividade & Docs',
+        folder: './deckcraft-web-0.5.0/index.html',
+        color: '#431407',
+        accent: '#f97316',
+        size: '28,6 MB',
+        desc: 'Criação de apresentações e slide decks com fontes incorporadas, layouts mestres, transições e modo apresentador.'
+      },
+      {
+        id: 'cadcraft',
+        name: 'CADCraft',
+        code: 'Cd',
+        version: '0.5.0',
+        inspiredBy: 'Autodesk AutoCAD',
+        category: 'engineering',
+        categoryLabel: 'CAD & Sistema',
+        folder: './cadcraft-web-0.5.0/index.html',
+        color: '#3f0d12',
+        accent: '#f43f5e',
+        size: '14,6 MB',
+        desc: 'Desenho técnico assistido por computador (CAD 2D/3D), precisão geométrica, camadas de engenharia, cotas e snaps.'
+      },
+      {
+        id: 'launcher',
+        name: 'ArtCraft Launcher',
+        code: 'La',
+        version: '0.2.0',
+        inspiredBy: 'Creative Cloud Desktop',
+        category: 'engineering',
+        categoryLabel: 'CAD & Sistema',
+        folder: './artcraft-launcher-web-0.2.0/index.html',
+        color: '#1f242d',
+        accent: '#a855f7',
+        size: '9,0 MB',
+        desc: 'Catálogo oficial nativo em egui que consulta a API do GitHub em tempo real para baixar instaladores Desktop (Windows, macOS, Linux).'
+      }
+    ];
+
+    // Estado da Aplicação
+    const openInstances = new Map(); // appId -> { iframe, tabEl }
+    let activeView = 'dashboard'; // 'dashboard' ou appId
+    let currentCategory = 'all';
+    let searchQuery = '';
+
+    // Elementos DOM
+    const sidebar = document.getElementById('sidebar');
+    const sidebarNav = document.getElementById('sidebar-nav');
+    const appsGrid = document.getElementById('apps-grid');
+    const workspaceTabs = document.getElementById('workspace-tabs');
+    const tabDashboard = document.getElementById('tab-dashboard');
+    const dashboardView = document.getElementById('dashboard-view');
+    const framesStage = document.getElementById('frames-stage');
+    const searchInput = document.getElementById('search-input');
+    const filterPills = document.getElementById('filter-pills');
+    const rendererMode = document.getElementById('renderer-mode');
+    const btnReloadApp = document.getElementById('btn-reload-app');
+    const btnExternalApp = document.getElementById('btn-external-app');
+    const protocolWarning = document.getElementById('protocol-warning');
+    const serverModal = document.getElementById('server-modal');
+
+    // Verificar protocolo file://
+    if (window.location.protocol === 'file:') {
+      protocolWarning.classList.add('show');
+    }
+
+    // Construir URL com flag de renderizador se selecionado
+    function buildAppUrl(baseUrl) {
+      const flag = rendererMode.value;
+      return flag ? `${baseUrl}${flag}` : baseUrl;
+    }
+
+    // Renderizar Barra Lateral
+    function renderSidebar() {
+      const categories = [
+        { key: 'creative', title: 'Design & Imagem' },
+        { key: 'video', title: 'Vídeo & Áudio' },
+        { key: 'office', title: 'Produtividade' },
+        { key: 'engineering', title: 'CAD & Sistema' }
+      ];
+
+      sidebarNav.innerHTML = '';
+
+      categories.forEach(cat => {
+        const titleEl = document.createElement('div');
+        titleEl.className = 'nav-section-title';
+        titleEl.textContent = cat.title;
+        sidebarNav.appendChild(titleEl);
+
+        APPS.filter(a => a.category === cat.key).forEach(app => {
+          const isRunning = openInstances.has(app.id);
+          const isActive = activeView === app.id;
+
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = `nav-item ${isActive ? 'active' : ''}`;
+          btn.title = `${app.name} (${app.inspiredBy})`;
+          btn.innerHTML = `
+            <span class="app-tile-icon" style="background:${app.color}; color:${app.accent}">
+              ${app.code}
+            </span>
+            <span class="nav-label-group">
+              <span class="nav-app-name">${app.name}</span>
+              <span class="nav-app-sub">${app.inspiredBy}</span>
+            </span>
+            ${isRunning ? '<span class="running-indicator" title="Em execução"></span>' : ''}
+          `;
+          btn.addEventListener('click', () => launchOrFocusApp(app.id));
+          sidebarNav.appendChild(btn);
+        });
+      });
+    }
+
+    // Renderizar Grid de Cards no Dashboard
+    function renderDashboardGrid() {
+      const q = searchQuery.trim().toLowerCase();
+      const filtered = APPS.filter(app => {
+        const matchesCat = currentCategory === 'all' || app.category === currentCategory;
+        const matchesQuery = !q ||
+          app.name.toLowerCase().includes(q) ||
+          app.inspiredBy.toLowerCase().includes(q) ||
+          app.desc.toLowerCase().includes(q) ||
+          app.code.toLowerCase().includes(q);
+        return matchesCat && matchesQuery;
+      });
+
+      appsGrid.innerHTML = '';
+
+      filtered.forEach(app => {
+        const isRunning = openInstances.has(app.id);
+        const card = document.createElement('article');
+        card.className = 'app-card';
+        card.innerHTML = `
+          <div class="card-top">
+            <div class="card-identity">
+              <div class="card-icon" style="background:${app.color}; color:${app.accent}">
+                ${app.code}
+              </div>
+              <div class="card-titles">
+                <h2>
+                  ${app.name}
+                  <span class="version-tag">v${app.version}</span>
+                </h2>
+                <div class="inspired-tag">Equivalente: <strong>${app.inspiredBy}</strong></div>
+              </div>
+            </div>
+          </div>
+          <p class="card-desc">${app.desc}</p>
+          <div class="card-meta">
+            <span>Categoria: ${app.categoryLabel}</span>
+            <span>WASM: ${app.size}</span>
+          </div>
+          <div class="card-actions">
+            <button type="button" class="btn-launch" data-launch="${app.id}">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <polygon points="5 3 19 12 5 21 5 3"/>
+              </svg>
+              <span>${isRunning ? 'Alternar para App' : 'Iniciar no Portal'}</span>
+            </button>
+            <a href="${buildAppUrl(app.folder)}" target="_blank" rel="noopener" class="btn-newtab" title="Abrir em nova guia isolada" aria-label="Abrir ${app.name} em nova guia">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+              </svg>
+            </a>
+          </div>
+        `;
+
+        card.querySelector('[data-launch]').addEventListener('click', () => {
+          launchOrFocusApp(app.id);
+        });
+
+        appsGrid.appendChild(card);
+      });
+    }
+
+    // Abrir ou Focar um Aplicativo
+    function launchOrFocusApp(appId) {
+      const app = APPS.find(a => a.id === appId);
+      if (!app) return;
+
+      if (!openInstances.has(appId)) {
+        // Criar Iframe
+        const iframe = document.createElement('iframe');
+        iframe.className = 'app-iframe';
+        iframe.src = buildAppUrl(app.folder);
+        iframe.title = app.name;
+        iframe.allow = 'fullscreen; clipboard-read; clipboard-write';
+        iframe.setAttribute('allowfullscreen', '');
+        framesStage.appendChild(iframe);
+
+        // Criar Aba na Topbar
+        const tabEl = document.createElement('div');
+        tabEl.className = 'tab-item';
+        tabEl.setAttribute('role', 'tab');
+        tabEl.innerHTML = `
+          <span class="tab-dot" style="background:${app.accent}"></span>
+          <span>${app.name}</span>
+          <button type="button" class="tab-close" title="Encerrar ${app.name}" aria-label="Encerrar ${app.name}">×</button>
+        `;
+
+        tabEl.addEventListener('click', (e) => {
+          if (e.target.closest('.tab-close')) return;
+          setActiveView(appId);
+        });
+
+        tabEl.querySelector('.tab-close').addEventListener('click', (e) => {
+          e.stopPropagation();
+          closeAppInstance(appId);
+        });
+
+        workspaceTabs.appendChild(tabEl);
+        openInstances.set(appId, { app, iframe, tabEl });
+      }
+
+      setActiveView(appId);
+    }
+
+    // Alternar entre Dashboard e um Aplicativo Aberto
+    function setActiveView(viewId) {
+      activeView = viewId;
+
+      // Atualizar Aba do Dashboard
+      const isDash = viewId === 'dashboard';
+      tabDashboard.classList.toggle('active', isDash);
+      tabDashboard.setAttribute('aria-selected', String(isDash));
+      dashboardView.classList.toggle('hidden', !isDash);
+      framesStage.classList.toggle('active', !isDash);
+
+      // Atualizar Abas e Iframes dos Apps
+      openInstances.forEach((inst, id) => {
+        const isCurrent = id === viewId;
+        inst.tabEl.classList.toggle('active', isCurrent);
+        inst.tabEl.setAttribute('aria-selected', String(isCurrent));
+        inst.iframe.classList.toggle('visible', isCurrent);
+        if (isCurrent) {
+          inst.iframe.focus();
+        }
+      });
+
+      // Botões de contexto na Topbar
+      if (!isDash && openInstances.has(viewId)) {
+        const currentApp = openInstances.get(viewId).app;
+        btnReloadApp.hidden = false;
+        btnExternalApp.hidden = false;
+        btnExternalApp.href = buildAppUrl(currentApp.folder);
+      } else {
+        btnReloadApp.hidden = true;
+        btnExternalApp.hidden = true;
+      }
+
+      renderSidebar();
+      if (isDash) {
+        renderDashboardGrid();
+      }
+    }
+
+    // Fechar a instância de um Aplicativo (libera memória WASM/WebGPU)
+    function closeAppInstance(appId) {
+      const inst = openInstances.get(appId);
+      if (!inst) return;
+
+      inst.iframe.src = 'about:blank';
+      inst.iframe.remove();
+      inst.tabEl.remove();
+      openInstances.delete(appId);
+
+      if (activeView === appId) {
+        const remainingKeys = Array.from(openInstances.keys());
+        const nextView = remainingKeys.length > 0 ? remainingKeys[remainingKeys.length - 1] : 'dashboard';
+        setActiveView(nextView);
+      } else {
+        renderSidebar();
+        renderDashboardGrid();
+      }
+    }
+
+    // Eventos de Interface
+    document.getElementById('toggle-sidebar').addEventListener('click', () => {
+      sidebar.classList.toggle('collapsed');
+    });
+
+    document.getElementById('btn-home').addEventListener('click', () => {
+      setActiveView('dashboard');
+    });
+
+    tabDashboard.addEventListener('click', () => {
+      setActiveView('dashboard');
+    });
+
+    btnReloadApp.addEventListener('click', () => {
+      if (activeView !== 'dashboard' && openInstances.has(activeView)) {
+        const inst = openInstances.get(activeView);
+        inst.iframe.src = buildAppUrl(inst.app.folder);
+      }
+    });
+
+    rendererMode.addEventListener('change', () => {
+      renderDashboardGrid();
+      if (activeView !== 'dashboard' && openInstances.has(activeView)) {
+        const inst = openInstances.get(activeView);
+        inst.iframe.src = buildAppUrl(inst.app.folder);
+      }
+    });
+
+    document.getElementById('btn-fullscreen').addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    });
+
+    document.getElementById('btn-server-info').addEventListener('click', () => {
+      serverModal.showModal();
+    });
+
+    document.getElementById('btn-open-guide').addEventListener('click', () => {
+      serverModal.showModal();
+    });
+
+    searchInput.addEventListener('input', (e) => {
+      searchQuery = e.target.value;
+      renderDashboardGrid();
+    });
+
+    filterPills.addEventListener('click', (e) => {
+      const btn = e.target.closest('.filter-btn');
+      if (!btn) return;
+      filterPills.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentCategory = btn.dataset.cat;
+      renderDashboardGrid();
+    });
+
+    // Atalho Ctrl+B para recolher a barra lateral
+    window.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+        e.preventDefault();
+        sidebar.classList.toggle('collapsed');
+      }
+    });
+
+    // Inicializar
+    renderSidebar();
+    renderDashboardGrid();
+  </script>
+</body>
+</html>
